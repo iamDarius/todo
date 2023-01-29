@@ -12,6 +12,7 @@ const checkbox = document.querySelector(".checkbox");
 
 getTodoCount();
 displayTodoList();
+getActiveTodos();
 
 // Event Listeners
 addNewTodoBtn.addEventListener("click", () => {
@@ -24,27 +25,23 @@ addNewTodoBtn.addEventListener("click", () => {
 // listens for removed todo items
 todoList &&
   todoList.addEventListener("click", (e) => {
-    if (e.target.className === "btn btn-danger") {
-      const id = e.target.id;
+    const id = e.target.id;
+    if (e.target.className === "btn btn-light") {
       removeTodo(id);
       displayTodoList();
       getTodoCount();
     }
-
-    if (e.target.className === "checkbox") {
-      const id = e.target.id;
-      if (e.target.checked) {
-        removeTodo(id);
-        displayTodoList();
-        getTodoCount();
-      } else {
-      }
-    }
   });
 
-checkbox &&
-  checkbox.addEventListener("click", (e) => {
-    console.log({ e });
+todoList &&
+  todoList.addEventListener("change", (e) => {
+    const id = e.target.id;
+    const checkbox = document.getElementById(id);
+    if (checkbox.checked) {
+      completeTodo(e);
+      displayTodoList();
+      getTodoCount();
+    }
   });
 
 function createTodo(text) {
@@ -53,7 +50,7 @@ function createTodo(text) {
   todos.push(newItem);
   todoList.innerHTML += `
     <div class="py-2 border-bottom row" id="item-${newItem.id}">
-       <div class="col-10"><input class="checkbox" type="checkbox" id="checkbox-${newItem.id}" name="${newItem.id}"><label for="${newItem.id}"> ${newItem.text}</label> </div>
+       <div class="col-10"><input class="checkbox align-bottom" type="checkbox" id="checkbox-${newItem.id}" name="${newItem.id}"><label class="align-bottom" for="${newItem.id}"> ${newItem.text}</label> </div>
        <div class="col-2"><button id="btn-${newItem.id}" class="btn btn-light">Remove</button></div> 
     </div>
     `;
@@ -73,7 +70,15 @@ function removeTodo(id) {
 function updateTodo() {}
 
 // Check off a Todo Item
-function completeTodo() {}
+function completeTodo(e) {
+  const textDevElementId = e.currentTarget.firstElementChild.id;
+  const uid = textDevElementId.slice(5);
+  const index = todos.findIndex((todo) => todo.id === uid);
+  todos[index].isComplete = true;
+
+  document.getElementById(textDevElementId).remove();
+  getActiveTodos();
+}
 
 // See All Completed Todos
 function viewCompletedTodos() {}
@@ -84,7 +89,10 @@ function getItemId(id) {
 }
 
 function getTodoCount() {
-  todoCount.innerHTML = todos.length ? `${todos.length} Items` : "There are no active items.";
+  const activeTodos = todos.filter((todo) => !todo.isComplete);
+  todoCount.innerHTML =
+    activeTodos && activeTodos.length ? `${activeTodos.length} Items` : "There are no active items.";
+  console.log({ todos });
 }
 
 function displayTodoList() {
@@ -93,4 +101,8 @@ function displayTodoList() {
   } else {
     listContainer.classList.replace("display-list", "hide-list");
   }
+}
+
+function getActiveTodos() {
+  todos.filter((todo) => !todo.isComplete);
 }

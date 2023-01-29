@@ -140,3 +140,7 @@ div.uploader {
 .hide-list {
   display: none;
 }
+
+.btn-margin {
+  margin-top: -10px !important;
+}
